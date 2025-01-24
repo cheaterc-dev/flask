@@ -68,7 +68,7 @@ def login():
             session['logged_in'] = True
             return redirect(url_for('index'))
         else:
-            return render_template('login.html', error="Неверный пароль!")
+            return render_template('login.html', error="Bad password")
     return render_template('login.html')
 
 # Главная страница
