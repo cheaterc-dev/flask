@@ -18,20 +18,37 @@ def is_logged_in():
     return session.get('logged_in', False)
 
 # Получение списка виртуальных машин
+
+
+
+EXCLUDED_VMS = ['Ansible-32', 'Clone','112', 'Win10']
+
+
+
 def get_vms():
     headers = {
         'Authorization': f"PVEAPIToken={PROXMOX_API_TOKEN}"
     }
     url = f"{PROXMOX_URL}/nodes/{PROXMOX_NODE}/qemu"
     response = requests.get(url, headers=headers, verify=False)
+    
     if response.status_code == 200:
         vms = response.json()['data']
-        # Сортировка по имени (name) или ID (vmid)
+        
+        # Фильтрация виртуальных машин
+        vms = [vm for vm in vms if vm['name'].strip() not in EXCLUDED_VMS]  # Убираем лишние пробелы
+        
+        # Сортировка виртуальных машин по имени
         return sorted(vms, key=lambda vm: vm['name'])  # Сортировать по имени
-        # return sorted(vms, key=lambda vm: vm['vmid'])  # Сортировать по ID
     else:
         print(f"Failed to fetch VMs: {response.status_code}, {response.text}")
+    
     return []
+
+
+
+
+
 
 # Перезагрузка виртуальной машины
 def reboot_vm(vm_id):
